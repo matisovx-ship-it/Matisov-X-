@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MATISOV X — Cyber Samurai</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+
+    :root{
+      --neon:#00d2ff;
+      --pink:#ff007a;
+      --bg:#02040a;
+      --glass: rgba(5, 10, 20, 0.92);
+      --line: rgba(0, 210, 255, 0.16);
+      --muted: rgba(255,255,255,0.55);
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    body{
+      margin:0;
+      height:100vh;
+      width:100vw;
+      overflow:hidden;
+      color:#fff;
+      background: radial-gradient(circle at 50% 20%, #0b2a44, var(--bg));
+      font-family: 'Rajdhani', sans-serif;
+      touch-action: manipulation;
+    }
+
+    #bg{
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(0,210,255,0.10), transparent 45%),
+        radial-gradient(circle at 20% 60%, rgba(255,0,122,0.10), transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(0,210,255,0.08), transparent 50%),
+        linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.70));
+      z-index:-3;
+    }
+
+    #bgImage{
+      position:fixed;
+      inset:0;
+      background: url('https://raw.githubusercontent.com/matisovx-ship-it/Matisov-X-beta/main/1771154757483~2.png') no-repeat center center;
+      background-size: cover;
+      filter: brightness(0.45) contrast(1.12);
+      z-index:-4;
+    }
+
+    .glass{
+      background: var(--glass);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      border-radius: 22px;
+      box-shadow:
+        0 14px 32px rgba(0,0,0,0.72),
+        inset 0 0 18px rgba(0,210,255,0.05);
+    }
+
+    .mono{
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .ai-dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: var(--pink);
+      box-shadow: 0 0 12px rgba(255,0,122,0.9);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse{
+      0%,100%{ transform: scale(0.9); opacity: 0.65; }
+      50%{ transform: scale(1.25); opacity: 1; }
+    }
+
+    #app{
+      height:100vh;
+      padding: 18px;
+      padding-bottom: 118px;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+    }
+
+    #headerRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 12px;
+    }
+
+    #brand{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+
+    #brandTitle{
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      line-height: 1;
+      font-family: 'Orbitron', sans-serif;
+      font-style: italic;
+    }
+
+    #aiBox{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-left: 4px solid var(--pink);
+    }
+
+    #aiText{
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.2;
+    }
+
+    #balanceCard{
+      padding: 12px 14px;
+      min-width: 150px;
+      text-align:right;
+    }
+
+    #balanceMX{
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+      font-family: 'Orbitron', sans-serif;
+      font-style: italic;
+    }
+
+    #balanceLabel{
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(0,210,255,0.92);
+      margin-top: 4px;
+    }
+
+    #playerRow{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+
+    #playerAvatar{
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      border: 2px solid rgba(0,210,255,0.75);
+      padding: 3px;
+      object-fit: cover;
+      box-shadow: 0 0 18px rgba(0,210,255,0.18);
+      background: rgba(0,0,0,0.35);
+    }
+
+    #playerMeta{
+      display:flex;
+      flex-direction:column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    #playerName{
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      line-height: 1.1;
+    }
+
+    #playerId{
+      font-size: 10px;
+      color: rgba(255,255,255,0.55);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 68vw;
+    }
+
+    #scene{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      border-radius: 26px;
+      overflow:hidden;
+    }
+
+    #gridFloor{
+      position:absolute;
+      inset:-40% -50%;
+      background:
+        linear-gradient(rgba(0,210,255,0.8) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,210,255,0.8) 1px, transparent 1px);
+      background-size: 84px 84px;
+      opacity: 0.06;
+      transform: rotateX(70deg);
+      transform-origin: center;
+      bottom: -65%;
+      pointer-events:none;
+    }
+
+    #heroZone{
+      width: min(340px, 92vw);
+      max-height: 46vh;
+      height: 100%;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      position:relative;
+      z-index: 5;
+      filter: drop-shadow(0 0 28px rgba(0,210,255,0.35));
+      touch-action: manipulation;
+      user-select:none;
+      cursor: pointer;
+    }
+
+    #heroImg{
+      width:100%;
+      height:auto;
+      max-height: 100%;
+      object-fit: contain;
+      display:block;
+      animation: idle 3.2s ease-in-out infinite;
+      transform-origin: 50% 70%;
+    }
+
+    @keyframes idle{
+      0%,100%{ transform: translateY(0px); }
+      50%{ transform: translateY(-10px); }
+    }
+
+    .particle{
+      position:absolute;
+      pointer-events:none;
+      z-index: 2000;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      color: var(--neon);
+      text-shadow: 0 0 14px var(--neon), 0 0 30px rgba(255,255,255,0.55);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 2px;
+    }
+
+    #energyCard{
+      padding: 14px 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+
+    #energyTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 10px;
+    }
+
+    #energyLabel{
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(0,210,255,0.92);
+    }
+
+    #energyNumeric{
+      font-size: 12px;
+      font-weight: 900;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    #energyHint{
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.42);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    #barOuter{
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.65);
+      border: 1px solid rgba(0,210,255,0.28);
+      padding: 2px;
+      overflow:hidden;
+    }
+
+    #barInner{
+      height: 100%;
+      width: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(0,210,255,1), rgba(58,123,213,1));
+      box-shadow: 0 0 14px rgba(0,210,255,0.35);
+      transition: width 0.35s cubic-bezier(0.1, 0.7, 0.1, 1);
+    }
+
+    .screen{
+      position: fixed;
+      inset: 0;
+      z-index: 6000;
+      display:none;
+      flex-direction:column;
+      padding: 18px;
+      padding-bottom: 118px;
+      overflow-y:auto;
+      background: radial-gradient(circle at 50% 15%, rgba(0,210,255,0.08), transparent 45%),
+                  radial-gradient(circle at 60% 80%, rgba(255,0,122,0.06), transparent 45%),
+                  linear-gradient(180deg, rgba(0,0,0,0.82), rgba(0,0,0,0.92));
+      scrollbar-width: none;
+    }
+    .screen::-webkit-scrollbar{ display:none; }
+    .screen.visible{ display:flex; animation: fadeUp 0.25s ease-out; }
+    @keyframes fadeUp{
+      from{ opacity: 0; transform: translateY(16px); }
+      to{ opacity: 1; transform: translateY(0px); }
+    }
+
+    .screenHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom: 14px;
+    }
+
+    .screenTitle{
+      font-size: 22px;
+      font-weight: 900;
+      font-family: 'Orbitron', sans-serif;
+      font-style: italic;
+      letter-spacing:-0.4px;
+    }
+
+    .closeBtn{
+      font-size: 32px;
+      line-height: 1;
+      font-weight: 300;
+      color: rgba(255,255,255,0.85);
+      padding: 0 8px;
+    }
+
+    .rowCard{
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+    }
+
+    .rowCard:hover{
+      border-color: rgba(0,210,255,0.22);
+      background: rgba(0,210,255,0.04);
+    }
+
+    .btn{
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-weight: 900;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      font-size: 10px;
+      transition: transform 0.08s ease;
+      user-select:none;
+    }
+    .btn:active{ transform: scale(0.98); }
+
+    .btnPrimary{
+      background: rgba(0,210,255,0.92);
+      color: #000;
+    }
+
+    .btnGhost{
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    .btnDanger{
+      background: linear-gradient(135deg, rgba(255,0,122,1), rgba(122,0,255,1));
+      color: #fff;
+    }
+
+    .muted{
+      color: rgba(255,255,255,0.55);
+    }
+
+    #bottomNav{
+      position: fixed;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 9000;
+    }
+
+    #navInner{
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      padding: 10px 8px;
+      gap: 6px;
+    }
+
+    .navBtn{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 6px;
+      color: rgba(255,255,255,0.38);
+      transition: transform 0.2s ease, color 0.2s ease, filter 0.2s ease;
+      padding: 6px 0;
+    }
+    .navBtn span.icon{ font-size: 20px; line-height: 1; }
+    .navBtn span.label{ font-size: 9px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+    .navBtn.active{
+      color: rgba(0,210,255,0.95);
+      filter: drop-shadow(0 0 10px rgba(0,210,255,0.65));
+      transform: translateY(-4px);
+    }
+
+    .progressOuter{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.10);
+      padding: 2px;
+      overflow:hidden;
+    }
+    .progressInner{
+      height:100%;
+      width:0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(0,210,255,1), rgba(255,0,122,0.9));
+      transition: width 0.35s ease;
+    }
+
+    .pill{
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.10);
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .divider{
+      height:1px;
+      background: rgba(255,255,255,0.08);
+      margin: 12px 0;
+    }
+  
+    /* HERO FIT FIX */
+    @media (max-height: 720px){
+      #heroZone{ max-height: 42vh; }
+    }
+    @media (max-height: 640px){
+      #heroZone{ max-height: 38vh; }
+    }
+    </style>
+</head>
+
+<body>
+  <div id="bgImage"></div>
+  <div id="bg"></div>
+
+  <div id="app">
+    <div id="headerRow">
+      <div id="brand">
+        <div id="brandTitle">MATISOV <span style="color: var(--neon)">X</span></div>
+
+        <div id="aiBox" class="glass">
+          <div class="ai-dot"></div>
+          <div id="aiText">Matisov X AI: linking…</div>
+        </div>
+      </div>
+
+      <div id="balanceCard" class="glass">
+        <div id="balanceMX" class="mono">0</div>
+        <div id="balanceLabel">MX Points</div>
+      </div>
+    </div>
+
+    <div id="walletTop" class="glass">
+      <div class="smallLabel">Wallet TON</div>
+      <div id="walletAddr" class="mono">Not connected</div>
+      <div id="ton-connect-btn"></div>
+    </div>
+
+    <div id="playerRow">
+      <img id="playerAvatar" src="https://via.placeholder.com/80" alt="avatar">
+      <div id="playerMeta">
+        <div id="playerName">SAMURAI</div>
+        <div id="playerId">NEURAL ID: ...</div>
+      </div>
+    </div>
+
+    <div id="scene" class="glass">
+      <div id="gridFloor"></div>
+
+      <div id="heroZone" aria-label="Tap zone">
+        <img id="heroImg" src="https://raw.githubusercontent.com/matisovx-ship-it/Matisov-X-beta/main/file_00000000f6b4720a8cb3d5825edd6728_011655.png" alt="Cyber Samurai">
+      </div>
+    </div>
+
+    <div id="energyCard" class="glass">
+      <div id="energyTop">
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <div id="energyLabel">⚡ Energy</div>
+          <div id="energyNumeric" class="mono">0 / 0</div>
+        </div>
+        <div id="energyHint">regen: +0/sec</div>
+      </div>
+      <div id="barOuter">
+        <div id="barInner"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screenMissions" class="screen">
+    <div class="screenHeader">
+      <div class="screenTitle" style="color: var(--neon)">Missions</div>
+      <button class="closeBtn" onclick="UI.go('battle')">&times;</button>
+    </div>
+
+    <div class="rowCard" style="margin-bottom: 12px;">
+      <div>
+        <div class="mono" style="font-weight:900; font-size: 12px;">Referral Ladder</div>
+        <div class="muted" style="font-size: 11px; margin-top: 2px;">Earn bonuses as your network grows.</div>
+      </div>
+      <div class="pill">
+        <span>Lv</span>
+        <span id="refLevelPill" class="mono">0</span>
+      </div>
+    </div>
+
+    <div class="glass" style="padding: 14px; margin-bottom: 14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px;">
+        <div>
+          <div class="mono" style="font-weight:900; font-size: 12px;">Invite Link</div>
+          <div class="muted" style="font-size: 11px;">New player bonus: <span class="mono">50,000 MX</span></div>
+        </div>
+        <button class="btn btnPrimary" onclick="Referral.share()">Share</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="refLinkBox" class="mono" style="font-size: 10px; color: rgba(0,210,255,0.90); background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 14px; word-break: break-all;">
+        —
+      </div>
+
+      <div style="display:flex; gap: 10px; margin-top: 10px;">
+        <button class="btn btnGhost" style="flex:1;" onclick="Referral.copy()">Copy</button>
+        <button class="btn btnGhost" style="flex:1;" onclick="Referral.claim()">Claim Sponsor Bonus</button>
+      </div>
+
+      <div class="muted" style="font-size: 11px; margin-top: 10px;">
+        Sponsor bonus is issued when a new player opens the game with your <span class="mono">start</span> code on their device.
+      </div>
+    </div>
+
+    <div class="glass" style="padding: 14px; margin-bottom: 14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="mono" style="font-weight:900; font-size: 12px;">Your Network</div>
+          <div class="muted" style="font-size: 11px;">Direct invites: <span id="refDirect" class="mono">0</span></div>
+        </div>
+        <div class="pill">
+          <span>Total</span>
+          <span id="refTotal" class="mono">0</span>
+        </div>
+      </div>
+      <div style="margin-top: 10px;">
+        <div class="muted" style="font-size: 11px; display:flex; justify-content:space-between;">
+          <span>Progress to next bonus</span>
+          <span id="refProgressLabel" class="mono">0%</span>
+        </div>
+        <div class="progressOuter" style="margin-top: 6px;">
+          <div id="refProgressBar" class="progressInner"></div>
+        </div>
+      </div>
+      <div class="muted" style="font-size: 11px; margin-top: 10px;">
+        Ladder (Direct): 1→50k, 3→150k, 5→300k, 10→1M, 20→3M.
+      </div>
+    </div>
+
+    <div id="missionsList" style="display:flex; flex-direction:column; gap: 12px;"></div>
+  </div>
+
+  <div id="screenUpgrades" class="screen">
+    <div class="screenHeader">
+      <div class="screenTitle" style="color: #f59e0b">Upgrades</div>
+      <button class="closeBtn" onclick="UI.go('battle')">&times;</button>
+    </div>
+
+    <div class="glass" style="padding: 14px; margin-bottom: 14px;">
+      <div class="mono" style="font-weight:900; font-size: 12px;">Tap Power</div>
+      <div class="muted" style="font-size: 11px; margin-top: 2px;">Increase MX per tap (permanent).</div>
+      <div class="divider"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="pill"><span>Level</span><span id="tapLvl" class="mono">1</span></div>
+          <div class="muted" style="font-size: 11px; margin-top: 8px;">Power: <span id="tapPower" class="mono">1.0</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="muted" style="font-size: 11px;">Cost</div>
+          <div id="tapCost" class="mono" style="font-weight:900; font-size: 14px;">0</div>
+          <button class="btn btnPrimary" style="margin-top: 10px;" onclick="Upgrades.buyTap()">Upgrade</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass" style="padding: 14px; margin-bottom: 14px;">
+      <div class="mono" style="font-weight:900; font-size: 12px;">Energy Capacity</div>
+      <div class="muted" style="font-size: 11px; margin-top: 2px;">Bigger tank + faster regen.</div>
+      <div class="divider"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="pill"><span>Level</span><span id="eneLvl" class="mono">1</span></div>
+          <div class="muted" style="font-size: 11px; margin-top: 8px;">Max: <span id="eneMax" class="mono">1000</span></div>
+          <div class="muted" style="font-size: 11px; margin-top: 2px;">Regen: <span id="eneRegen" class="mono">5</span>/sec</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="muted" style="font-size: 11px;">Cost</div>
+          <div id="eneCost" class="mono" style="font-weight:900; font-size: 14px;">0</div>
+          <button class="btn btnPrimary" style="margin-top: 10px;" onclick="Upgrades.buyEnergy()">Upgrade</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass" style="padding: 14px; margin-bottom: 14px;">
+      <div class="mono" style="font-weight:900; font-size: 12px;">Burn Boost</div>
+      <div class="muted" style="font-size: 11px; margin-top: 2px;">Burn MX to overclock power (+2.5).</div>
+      <div class="divider"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="pill"><span>Burned</span><span id="burnedTotal" class="mono">0</span></div>
+          <div class="muted" style="font-size: 11px; margin-top: 8px;">Permanent power increases.</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="muted" style="font-size: 11px;">Cost</div>
+          <div class="mono" style="font-weight:900; font-size: 14px;">500,000 MX</div>
+          <button class="btn btnDanger" style="margin-top: 10px;" onclick="Upgrades.burn()">Burn</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screenProfile" class="screen">
+    <div class="screenHeader">
+      <div class="screenTitle" style="color: var(--pink)">Wallet Claim</div>
+      <button class="closeBtn" onclick="UI.go('battle')">&times;</button>
+    </div>
+
+    <div class="glass" style="padding: 14px; margin-bottom: 14px;">
+      <div class="mono" style="font-weight:900; font-size: 12px;">Claim NFT Voucher</div>
+      <div class="muted" style="font-size: 11px; margin-top: 2px;">Convert in-game MX to an NFT voucher.</div>
+      <div class="divider"></div>
+
+      <div class="rowCard" style="margin-bottom: 12px;">
+        <div>
+          <div class="mono" style="font-weight:900; font-size: 12px;">10 $Matisov X Voucher</div>
+          <div class="muted" style="font-size: 11px;">Cost: <span class="mono">100,000,000 MX</span> (burned)</div>
+        </div>
+        <button class="btn btnPrimary" onclick="Claim.openVoucher10()">Open</button>
+      </div>
+
+      <div id="voucher10Box" class="glass" style="padding: 14px; display:none;">
+        <div style="display:flex; align-items:center; gap: 12px;">
+          <img src="https://raw.githubusercontent.com/matisovx-ship-it/Matisov-X-beta/main/voucher_10.png" style="width: 88px; height: 88px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10);" alt="Voucher 10">
+          <div style="min-width:0;">
+            <div class="mono" style="font-weight:900; font-size: 12px;">Voucher Preview</div>
+            <div class="muted" style="font-size: 11px; margin-top: 2px;">Mint to your wallet. You pay gas.</div>
+            <div class="muted" style="font-size: 11px; margin-top: 6px;">Getgems item:</div>
+            <div class="mono" style="font-size: 10px; color: rgba(0,210,255,0.90); word-break: break-all;">
+              https://getgems.io/collection/EQAM6Jg8G2_9avTAfL_gPjW83cfcvbCTE1HgXI2IEKE1eN-J/EQCNVk-wsKGVP8qre_8hIR1Yj0TYP_S63cPH1mSGgGHSOzO3
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="muted" style="font-size: 11px;">
+          Step 1: Connect TON wallet (Tonkeeper). Step 2: Tap “Mint”.
+        </div>
+
+        <div style="display:flex; gap: 10px; margin-top: 12px;">
+          <button class="btn btnGhost" style="flex:1;" onclick="Claim.copyWalletHint()">Wallet help</button>
+          <button class="btn btnPrimary" style="flex:1;" onclick="Claim.mintVoucher10()">Mint</button>
+        </div>
+
+        <div id="mintStatus" class="muted" style="font-size: 11px; margin-top: 10px;"></div>
+      </div>
+    </div>
+
+    <div class="glass" style="padding: 14px; margin-bottom: 14px;">
+      <div class="mono" style="font-weight:900; font-size: 12px;">Matisov X AI</div>
+      <div class="muted" style="font-size: 11px; margin-top: 2px;">Autonomous tips & guidance during gameplay.</div>
+      <div class="divider"></div>
+      <div class="muted" style="font-size: 11px;">
+        AI runs locally in this build. For real referral crediting across users, connect the Bot backend later.
+      </div>
+    </div>
+  </div>
+
+  <div id="bottomNav" class="glass">
+    <div id="navInner">
+      <button id="navBattle" class="navBtn active" onclick="UI.go('battle')">
+        <span class="icon">⚔️</span>
+        <span class="label">Battle</span>
+      </button>
+
+      <button id="navMissions" class="navBtn" onclick="UI.go('missions')">
+        <span class="icon">📜</span>
+        <span class="label">Missions</span>
+      </button>
+
+      <button id="navUpgrades" class="navBtn" onclick="UI.go('upgrades')">
+        <span class="icon">🛠️</span>
+        <span class="label">Upgrades</span>
+      </button>
+
+      <button id="navProfile" class="navBtn" onclick="UI.go('profile')">
+        <span class="icon">💠</span>
+        <span class="label">Claim</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    const TG_USER = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+
+    const UID = TG_USER && TG_USER.id ? String(TG_USER.id) : "browser_guest";
+    const USER_NAME = TG_USER && TG_USER.first_name ? TG_USER.first_name : "Samurai";
+
+    const STORAGE = {
+      bal: `mx_bal_${UID}`,
+      ene: `mx_ene_${UID}`,
+      tapLvl: `mx_tapLvl_${UID}`,
+      eneLvl: `mx_eneLvl_${UID}`,
+      burned: `mx_burned_${UID}`,
+      missions: `mx_missions_${UID}`,
+      ref: `mx_ref_${UID}`,
+      refClaimed: `mx_ref_claimed_${UID}`,
+      refTree: `mx_ref_tree_${UID}`,
+      wallet: `mx_wallet_${UID}`
+    };
+  const MANIFEST_URL = 'https://raw.githubusercontent.com/matisovx-ship-it/Matisov-X-beta/main/manifest.json';
+  let tonUI = null;
+  function initTonConnect(){
+    if(!window.TONConnectUI || !document.getElementById('ton-connect-btn')) return;
+    try{
+      tonUI = new TONConnectUI.TonConnectUI({
+        manifestUrl: MANIFEST_URL,
+        buttonRootId: 'ton-connect-btn'
+      });
+      tonUI.onStatusChange(wallet=>{
+        const el = document.getElementById('walletAddr');
+        if(wallet && wallet.account && wallet.account.address){
+          const a = wallet.account.address;
+          el.textContent = a.slice(0, 6) + '…' + a.slice(-6);
+          try{ localStorage.setItem(STORAGE.wallet, a); }catch(_){}
+        } else {
+          el.textContent = 'Not connected';
+        }
+      });
+      const cached = localStorage.getItem(STORAGE.wallet);
+      if(cached){
+        document.getElementById('walletAddr').textContent = cached.slice(0,6)+'…'+cached.slice(-6);
+      }
+    }catch(e){
+      console.warn('TonConnect init failed', e);
+    }
+  }
+
+
+    const GAME = {
+      baseEnergy: 1000,
+      baseTapPower: 1.0,
+      baseRegen: 5,
+      burnCost: 500000,
+      burnGain: 2.5,
+      energyLevelCost: (lvl) => lvl * 250000,
+      energyLevelGain: 500,
+      tapLevelCost: (lvl) => lvl * 250000,
+      tapLevelGain: 1.0,
+      referralJoinBonus: 50000,
+      voucher10Cost: 100000000
+    };
+
+    const MISSIONS = [
+      { id: "m_tg_channel", title: "Matisov X Channel", reward: 1000000, url: "https://t.me/Matisov_X", icon: "📡" },
+      { id: "m_tg_chat", title: "Cyber Community Chat", reward: 1000000, url: "https://t.me/MatisovX", icon: "💬" },
+      { id: "m_youtube", title: "YouTube Neural Hub", reward: 1000000, url: "https://www.youtube.com/@MatisovX", icon: "📺" },
+      { id: "m_instagram", title: "Instagram Matrix", reward: 1000000, url: "https://www.instagram.com/matisov.x", icon: "📸" },
+      { id: "m_x", title: "X Intelligence", reward: 1000000, url: "https://x.com/matisovx", icon: "🐦" }
+    ];
+
+    const AI = {
+      lastTipAt: 0,
+      tips: [
+        "Matisov X AI: keep the rhythm — taps build momentum.",
+        "Matisov X AI: missions are fast power spikes. Verify and claim.",
+        "Matisov X AI: upgrade Energy to farm longer sessions.",
+        "Matisov X AI: burn MX to overclock your permanent power.",
+        "Matisov X AI: invite allies — build your referral ladder."
+      ],
+      say(text){
+        const el = document.getElementById("aiText");
+        el.textContent = text;
+        gsap.fromTo(el, {opacity:0, y:6}, {opacity:1, y:0, duration:0.22});
+      },
+      auto(){
+        const now = Date.now();
+        if (now - AI.lastTipAt < 9000) return;
+        AI.lastTipAt = now;
+        const pick = AI.tips[Math.floor(Math.random() * AI.tips.length)];
+        AI.say(pick);
+      }
+    };
+
+    const State = {
+      balance: parseFloat(localStorage.getItem(STORAGE.bal) || "0"),
+      energy: parseInt(localStorage.getItem(STORAGE.ene) || String(GAME.baseEnergy), 10),
+      tapLvl: parseInt(localStorage.getItem(STORAGE.tapLvl) || "1", 10),
+      eneLvl: parseInt(localStorage.getItem(STORAGE.eneLvl) || "1", 10),
+      burnedTotal: parseFloat(localStorage.getItem(STORAGE.burned) || "0"),
+      missionsDone: JSON.parse(localStorage.getItem(STORAGE.missions) || "[]"),
+      refData: JSON.parse(localStorage.getItem(STORAGE.ref) || "{}")
+    };
+
+    function maxEnergy(){
+      return GAME.baseEnergy + (State.eneLvl - 1) * GAME.energyLevelGain;
+    }
+
+    function regenPerSec(){
+      return GAME.baseRegen + (State.eneLvl - 1);
+    }
+
+    function tapPower(){
+      return GAME.baseTapPower + (State.tapLvl - 1) * GAME.tapLevelGain;
+    }
+
+    function effectiveTapPower(){
+      const burnsCount = Math.floor(State.burnedTotal / GAME.burnCost);
+      const extra = burnsCount * GAME.burnGain;
+      return tapPower() + extra;
+    }
+
+    function save(){
+      localStorage.setItem(STORAGE.bal, String(State.balance));
+      localStorage.setItem(STORAGE.ene, String(State.energy));
+      localStorage.setItem(STORAGE.tapLvl, String(State.tapLvl));
+      localStorage.setItem(STORAGE.eneLvl, String(State.eneLvl));
+      localStorage.setItem(STORAGE.burned, String(State.burnedTotal));
+      localStorage.setItem(STORAGE.missions, JSON.stringify(State.missionsDone));
+      localStorage.setItem(STORAGE.ref, JSON.stringify(State.refData));
+    }
+
+    function fmt(n){
+      try { return Math.floor(n).toLocaleString(); } catch { return String(Math.floor(n)); }
+    }
+
+    function render(){
+      document.getElementById("balanceMX").textContent = fmt(State.balance);
+
+      const maxE = maxEnergy();
+      if (State.energy > maxE) State.energy = maxE;
+
+      document.getElementById("energyNumeric").textContent = `${fmt(State.energy)} / ${fmt(maxE)}`;
+      document.getElementById("energyHint").textContent = `regen: +${regenPerSec()}/sec`;
+
+      const pct = maxE <= 0 ? 0 : Math.max(0, Math.min(100, (State.energy / maxE) * 100));
+      const bar = document.getElementById("barInner");
+      bar.style.width = pct + "%";
+
+      if (pct < 20){
+        bar.style.background = "linear-gradient(90deg, rgba(255,0,122,1), rgba(122,0,255,1))";
+        bar.style.boxShadow = "0 0 14px rgba(255,0,122,0.35)";
+      } else {
+        bar.style.background = "linear-gradient(90deg, rgba(0,210,255,1), rgba(58,123,213,1))";
+        bar.style.boxShadow = "0 0 14px rgba(0,210,255,0.35)";
+      }
+
+      document.getElementById("tapLvl").textContent = String(State.tapLvl);
+      document.getElementById("tapPower").textContent = effectiveTapPower().toFixed(1);
+
+      document.getElementById("eneLvl").textContent = String(State.eneLvl);
+      document.getElementById("eneMax").textContent = fmt(maxEnergy());
+      document.getElementById("eneRegen").textContent = String(regenPerSec());
+
+      document.getElementById("burnedTotal").textContent = fmt(State.burnedTotal);
+
+      document.getElementById("tapCost").textContent = fmt(GAME.tapLevelCost(State.tapLvl));
+      document.getElementById("eneCost").textContent = fmt(GAME.energyLevelCost(State.eneLvl));
+
+      Referral.render();
+      Missions.render();
+    }
+
+    const UI = {
+      go(screen){
+        const screens = {
+          missions: document.getElementById("screenMissions"),
+          upgrades: document.getElementById("screenUpgrades"),
+          profile: document.getElementById("screenProfile")
+        };
+
+        Object.values(screens).forEach(el => el.classList.remove("visible"));
+
+        document.getElementById("navBattle").classList.remove("active");
+        document.getElementById("navMissions").classList.remove("active");
+        document.getElementById("navUpgrades").classList.remove("active");
+        document.getElementById("navProfile").classList.remove("active");
+
+        if (screen === "missions"){
+          screens.missions.classList.add("visible");
+          document.getElementById("navMissions").classList.add("active");
+        } else if (screen === "upgrades"){
+          screens.upgrades.classList.add("visible");
+          document.getElementById("navUpgrades").classList.add("active");
+        } else if (screen === "profile"){
+          screens.profile.classList.add("visible");
+          document.getElementById("navProfile").classList.add("active");
+        } else {
+          document.getElementById("navBattle").classList.add("active");
+        }
+
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+      }
+    };
+
+    const Missions = {
+      cooldown: {},
+      render(){
+        const list = document.getElementById("missionsList");
+        list.innerHTML = "";
+
+        MISSIONS.forEach(m => {
+          const done = State.missionsDone.includes(m.id);
+
+          const row = document.createElement("div");
+          row.className = "rowCard";
+          if (done) row.style.opacity = "0.55";
+
+          const left = document.createElement("div");
+          left.style.display = "flex";
+          left.style.alignItems = "center";
+          left.style.gap = "12px";
+
+          const icon = document.createElement("div");
+          icon.style.fontSize = "26px";
+          icon.textContent = m.icon;
+
+          const meta = document.createElement("div");
+          meta.innerHTML = `
+            <div class="mono" style="font-weight:900; font-size: 12px;">${m.title}</div>
+            <div class="muted" style="font-size: 11px; margin-top: 2px;">+${fmt(m.reward)} MX</div>
+          `;
+
+          left.appendChild(icon);
+          left.appendChild(meta);
+
+          const btn = document.createElement("button");
+          btn.className = "btn " + (done ? "btnGhost" : "btnPrimary");
+          btn.textContent = done ? "Completed" : "Verify";
+          btn.disabled = !!done;
+          btn.onclick = () => Missions.verify(m);
+
+          row.appendChild(left);
+          row.appendChild(btn);
+          list.appendChild(row);
+        });
+      },
+      verify(m){
+        if (State.missionsDone.includes(m.id)) return;
+
+        if (tg && tg.openLink) tg.openLink(m.url);
+        else window.open(m.url, "_blank");
+
+        AI.say("Matisov X AI: verifying activity…");
+
+        if (Missions.cooldown[m.id]) return;
+        Missions.cooldown[m.id] = true;
+
+        setTimeout(() => {
+          State.balance += m.reward;
+          State.missionsDone.push(m.id);
+
+          save();
+          render();
+
+          Missions.cooldown[m.id] = false;
+
+          if (tg && tg.showAlert) tg.showAlert("Mission verified: +1,000,000 MX");
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+
+          AI.say("Matisov X AI: verified — reward added.");
+        }, 5000);
+      }
+    };
+
+    const Referral = {
+      botUsername: "Matisov_X_bot",
+      ladder: [
+        { need: 1, bonus: 50000 },
+        { need: 3, bonus: 150000 },
+        { need: 5, bonus: 300000 },
+        { need: 10, bonus: 1000000 },
+        { need: 20, bonus: 3000000 }
+      ],
+      init(){
+        const link = `https://t.me/${Referral.botUsername}?start=${UID}`;
+        document.getElementById("refLinkBox").textContent = link;
+      },
+      readStartParam(){
+        const p1 = new URLSearchParams(window.location.search);
+        const fromUrl = p1.get("start");
+
+        let fromTg = null;
+        try{
+          fromTg = tg && tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
+        }catch(e){}
+
+        return String(fromTg || fromUrl || "");
+      },
+      checkJoinBonus(){
+        const sponsorId = Referral.readStartParam();
+        if (!sponsorId) return;
+        if (sponsorId === UID) return;
+
+        const already = localStorage.getItem(STORAGE.refClaimed);
+        if (already) return;
+
+        State.balance += GAME.referralJoinBonus;
+        localStorage.setItem(STORAGE.refClaimed, "true");
+
+        State.refData.sponsor = sponsorId;
+
+        save();
+        render();
+
+        if (tg && tg.showAlert) tg.showAlert("Join bonus: +50,000 MX");
+        AI.say("Matisov X AI: join bonus unlocked.");
+      },
+      claim(){
+        const sponsorId = State.refData.sponsor;
+        if (!sponsorId){
+          if (tg && tg.showAlert) tg.showAlert("No sponsor detected for this account.");
+          else alert("No sponsor detected for this account.");
+          return;
+        }
+
+        const treeKey = STORAGE.refTree;
+        const treeRaw = localStorage.getItem(treeKey) || "{}";
+        const tree = JSON.parse(treeRaw);
+
+        if (!tree[sponsorId]){
+          tree[sponsorId] = { direct: 0 };
+        }
+
+        if (State.refData.sponsorClaimed) {
+          if (tg && tg.showAlert) tg.showAlert("Sponsor already credited on this device.");
+          else alert("Sponsor already credited on this device.");
+          return;
+        }
+
+        tree[sponsorId].direct += 1;
+        State.refData.sponsorClaimed = true;
+
+        localStorage.setItem(treeKey, JSON.stringify(tree));
+        save();
+        render();
+
+        if (tg && tg.showAlert) tg.showAlert("Sponsor credited (device-local). For global tracking, connect backend later.");
+        AI.say("Matisov X AI: sponsor credited (local).");
+      },
+      computeLocalNetwork(){
+        const treeRaw = localStorage.getItem(STORAGE.refTree) || "{}";
+        const tree = JSON.parse(treeRaw);
+
+        const me = tree[UID] ? tree[UID] : { direct: 0 };
+        const direct = me.direct || 0;
+
+        let lvl = 0;
+        for (const step of Referral.ladder){
+          if (direct >= step.need) lvl += 1;
+        }
+
+        let nextNeed = null;
+        for (const step of Referral.ladder){
+          if (direct < step.need){
+            nextNeed = step.need;
+            break;
+          }
+        }
+
+        let progressPct = 100;
+        if (nextNeed !== null){
+          const idx = Referral.ladder.findIndex(s => s.need === nextNeed);
+          const prevNeed = idx > 0 ? Referral.ladder[idx - 1].need : 0;
+          const span = (nextNeed - prevNeed) || 1;
+          progressPct = ((direct - prevNeed) / span) * 100;
+          progressPct = Math.max(0, Math.min(100, progressPct));
+        }
+
+        return { direct, total: direct, lvl, progressPct };
+      },
+      render(){
+        Referral.init();
+
+        const net = Referral.computeLocalNetwork();
+
+        document.getElementById("refDirect").textContent = fmt(net.direct);
+        document.getElementById("refTotal").textContent = fmt(net.total);
+        document.getElementById("refLevelPill").textContent = String(net.lvl);
+
+        document.getElementById("refProgressLabel").textContent = `${Math.floor(net.progressPct)}%`;
+        document.getElementById("refProgressBar").style.width = `${net.progressPct}%`;
+      },
+      copy(){
+        const link = `https://t.me/${Referral.botUsername}?start=${UID}`;
+        (navigator.clipboard?.writeText(link) || Promise.reject()).then(() => {
+          if (tg && tg.showAlert) tg.showAlert("Copied!");
+          else alert("Copied!");
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+        }).catch(() => {
+          const temp = document.createElement("input");
+          temp.value = link;
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand("copy");
+          document.body.removeChild(temp);
+          if (tg && tg.showAlert) tg.showAlert("Copied!");
+          else alert("Copied!");
+        });
+      },
+      share(){
+        const link = `https://t.me/${Referral.botUsername}?start=${UID}`;
+        const msg = `⚔️ MATISOV X — Cyber Samurai\nJoin and mine MX in Telegram:\n${link}\n\nJoin bonus: 50,000 MX`;
+
+        if (navigator.share){
+          navigator.share({ title: "MATISOV X", text: msg }).catch(() => {});
+        } else {
+          Referral.copy();
+        }
+      }
+    };
+
+    const Upgrades = {
+      buyTap(){
+        const cost = GAME.tapLevelCost(State.tapLvl);
+        if (State.balance < cost){
+          if (tg && tg.showAlert) tg.showAlert("Not enough MX.");
+          else alert("Not enough MX.");
+          AI.say("Matisov X AI: insufficient balance.");
+          return;
+        }
+        State.balance -= cost;
+        State.tapLvl += 1;
+        save(); render();
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+        AI.say("Matisov X AI: tap power upgraded.");
+      },
+      buyEnergy(){
+        const cost = GAME.energyLevelCost(State.eneLvl);
+        if (State.balance < cost){
+          if (tg && tg.showAlert) tg.showAlert("Not enough MX.");
+          else alert("Not enough MX.");
+          AI.say("Matisov X AI: insufficient balance.");
+          return;
+        }
+        State.balance -= cost;
+        State.eneLvl += 1;
+        State.energy = Math.min(maxEnergy(), State.energy + GAME.energyLevelGain);
+        save(); render();
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+        AI.say("Matisov X AI: energy system upgraded.");
+      },
+      burn(){
+        if (State.balance < GAME.burnCost){
+          if (tg && tg.showAlert) tg.showAlert("Need 500,000 MX to burn.");
+          else alert("Need 500,000 MX to burn.");
+          return;
+        }
+        State.balance -= GAME.burnCost;
+        State.burnedTotal += GAME.burnCost;
+
+        const hero = document.getElementById("heroZone");
+        gsap.fromTo(hero, {filter:"brightness(1) contrast(1)"}, {filter:"brightness(1.35) contrast(1.15) hue-rotate(18deg)", duration:0.14, yoyo:true, repeat:1});
+
+        save(); render();
+        AI.say("Matisov X AI: burn complete. Power overclocked.");
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+      }
+    };
+
+    const Claim = {
+      openVoucher10(){
+        const box = document.getElementById("voucher10Box");
+        box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+      },
+      copyWalletHint(){
+        const text = "Open Tonkeeper → connect wallet → return to the game → Mint.";
+        (navigator.clipboard?.writeText(text) || Promise.reject()).then(() => {
+          if (tg && tg.showAlert) tg.showAlert("Hint copied.");
+          else alert("Hint copied.");
+        }).catch(() => {
+          if (tg && tg.showAlert) tg.showAlert(text);
+          else alert(text);
+        });
+      },
+      mintVoucher10(){
+        const status = document.getElementById("mintStatus");
+        status.textContent = "";
+
+        if (State.balance < GAME.voucher10Cost){
+          const msg = "Need 100,000,000 MX to mint a 10-coin voucher.";
+          if (tg && tg.showAlert) tg.showAlert(msg);
+          else alert(msg);
+          return;
+        }
+
+        State.balance -= GAME.voucher10Cost;
+        save(); render();
+
+        const workerUrl = localStorage.getItem("matisovx_worker_url") || "";
+        if (!workerUrl){
+          status.textContent = "Backend URL is not set. (Worker required for real mint).";
+          AI.say("Matisov X AI: mint backend missing.");
+          State.balance += GAME.voucher10Cost;
+          save(); render();
+          return;
+        }
+
+        status.textContent = "Mint request sent…";
+
+        fetch(workerUrl.replace(/\/+$/,'') + "/api/mint/voucher10", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ uid: UID })
+        }).then(async (r) => {
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok){
+            throw new Error(j?.error || "Mint failed");
+          }
+          status.textContent = "Minted! Check your wallet / Getgems.";
+          AI.say("Matisov X AI: voucher minted successfully.");
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+        }).catch((err) => {
+          status.textContent = "Mint error: " + String(err.message || err);
+          AI.say("Matisov X AI: mint failed. Restoring MX.");
+          State.balance += GAME.voucher10Cost;
+          save(); render();
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
+        });
+      }
+    };
+
+    function tapParticle(x, y, amount){
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      p.innerHTML = `<div style="font-size: 26px;">🪙</div><div style="font-size: 12px;">+${amount.toFixed(1)}</div>`;
+      document.body.appendChild(p);
+
+      gsap.to(p, {
+        y: y - 170,
+        x: x + (Math.random() - 0.5) * 90,
+        opacity: 0,
+        scale: 2.0,
+        duration: 0.75,
+        ease: "power2.out",
+        onComplete: () => p.remove()
+      });
+    }
+
+    function onTap(ev){
+      let clientX = 0;
+      let clientY = 0;
+
+      if (ev.touches && ev.touches[0]){
+        clientX = ev.touches[0].clientX;
+        clientY = ev.touches[0].clientY;
+      } else if (ev.clientX != null){
+        clientX = ev.clientX;
+        clientY = ev.clientY;
+      } else {
+        clientX = window.innerWidth / 2;
+        clientY = window.innerHeight / 2;
+      }
+
+      if (State.energy < 1){
+        AI.say("Matisov X AI: energy low — wait regen.");
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("warning");
+        return;
+      }
+
+      const gain = effectiveTapPower();
+      State.balance += gain;
+      State.energy -= 1;
+
+      const hero = document.getElementById("heroZone");
+      hero.style.transform = "scale(0.96) rotate(-1deg)";
+      setTimeout(() => hero.style.transform = "scale(1) rotate(0deg)", 65);
+
+      tapParticle(clientX, clientY, gain);
+
+      if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+
+      save(); render();
+
+      if (Math.random() > 0.985){
+        AI.auto();
+      }
+    }
+
+    function startRegen(){
+      setInterval(() => {
+        const maxE = maxEnergy();
+        if (State.energy < maxE){
+          State.energy = Math.min(maxE, State.energy + regenPerSec());
+          save(); render();
+        }
+        AI.auto();
+      }, 1000);
+    }
+
+    function init(){
+      if (tg){
+        tg.expand();
+        tg.ready();
+      }
+      initTonConnect();
+
+      document.getElementById("playerName").textContent = String(USER_NAME).toUpperCase();
+      document.getElementById("playerId").textContent = "NEURAL ID: " + UID;
+
+      if (TG_USER && TG_USER.photo_url){
+        document.getElementById("playerAvatar").src = TG_USER.photo_url;
+      } else {
+        document.getElementById("playerAvatar").src = "https://raw.githubusercontent.com/matisovx-ship-it/Matisov-X-beta/main/voucher_10.png";
+      }
+
+      const heroZone = document.getElementById("heroZone");
+      heroZone.addEventListener("pointerdown", (e) => { e.preventDefault(); onTap(e); }, { passive: false });
+      heroZone.addEventListener("touchstart", (e) => { e.preventDefault(); onTap(e); }, { passive: false });
+      heroZone.addEventListener("mousedown", (e) => { e.preventDefault(); onTap(e); }, { passive: false });
+      heroZone.addEventListener("click", (e) => { e.preventDefault(); onTap(e); }, { passive: false });
+
+      Referral.checkJoinBonus();
+      render();
+      startRegen();
+
+      AI.say("Matisov X AI: online. Tap to mine MX.");
+    }
+
+    window.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
